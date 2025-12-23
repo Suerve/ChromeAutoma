@@ -1,0 +1,4 @@
+onlyBuiltDependencies:
+  - core-js
+  - simple-git-hooks
+  - vue-demi

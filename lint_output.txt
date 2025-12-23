@@ -1,0 +1,31 @@
+
+> automa@1.29.12 lint
+> eslint --ext .js,.vue --ignore-path .gitignore .
+
+
+C:\Users\donteb\OneDrive\Projects\ChromeAutoma\src\newtab\pages\workflows\[id].vue
+  592:3  warning  Unexpected console statement  no-console
+
+C:\Users\donteb\OneDrive\Projects\ChromeAutoma\src\params\App.vue
+  212:3  warning  Unexpected console statement  no-console
+  218:5  warning  Unexpected console statement  no-console
+  326:3  warning  Unexpected console statement  no-console
+  328:5  warning  Unexpected console statement  no-console
+
+C:\Users\donteb\OneDrive\Projects\ChromeAutoma\src\utils\FindElement.js
+  182:1  error  Delete `␍⏎␍⏎`  prettier/prettier
+
+C:\Users\donteb\OneDrive\Projects\ChromeAutoma\src\workflowEngine\WorkflowEngine.js
+  130:7  warning  Unexpected console statement  no-console
+
+C:\Users\donteb\OneDrive\Projects\ChromeAutoma\src\workflowEngine\blocksHandler\handlerCreateElement.js
+  166:7  warning  Unexpected console statement  no-console
+
+C:\Users\donteb\OneDrive\Projects\ChromeAutoma\src\workflowEngine\helper.js
+  24:11  warning  Unexpected console statement  no-console
+  33:7   warning  Unexpected console statement  no-console
+  39:7   warning  Unexpected console statement  no-console
+
+✖ 11 problems (1 error, 10 warnings)
+  1 error and 0 warnings potentially fixable with the `--fix` option.
+

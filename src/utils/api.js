@@ -3,6 +3,16 @@ import secrets from 'secrets';
 import { isObject, parseJSON } from './helper';
 
 export async function fetchApi(path, options = {}) {
+  if (!secrets.baseApiUrl) {
+    return {
+      ok: false,
+      status: 501,
+      statusText: 'API URL not configured',
+      json: async () => ({ message: 'API URL not configured' }),
+      text: async () => 'API URL not configured',
+    };
+  }
+
   const urlPath = path.startsWith('/') ? path : `/${path}`;
   const headers = {
     'Content-Type': 'application/json',

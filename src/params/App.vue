@@ -209,13 +209,12 @@ function deleteWorkflow(index) {
   }
 }
 async function addWorkflow(workflowId) {
-  console.log('🚀 ~ addWorkflow ~ workflowId:', workflowId);
   try {
     const workflow =
       typeof workflowId === 'string'
         ? await findWorkflow(workflowId)
         : workflowId;
-    console.log('🚀 ~ addWorkflow ~ workflow:', workflow);
+
     const triggerBlock = workflow.drawflow.nodes.find(
       (node) => node.label === 'trigger'
     );
@@ -323,9 +322,7 @@ function isValidParams(params) {
 let checkTimeout = null;
 
 browser.runtime.onMessage.addListener(({ name, data }) => {
-  console.log('🚀 params html ~ name:', name, data);
   if (name === 'workflow:params') {
-    console.log('🚀 从popup的事件监听中触发', name, data);
     addWorkflow(data);
   } else if (name === 'workflow:params-block') {
     const params = [...data.params];

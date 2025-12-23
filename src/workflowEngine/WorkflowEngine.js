@@ -127,8 +127,6 @@ class WorkflowEngine {
         return;
       }
 
-      console.log('before execute', this.state, '\n', this.workflow);
-
       const { nodes, edges } = this.workflow.drawflow;
       if (!nodes || nodes.length === 0) {
         console.error(`${this.workflow.name} doesn't have blocks`);

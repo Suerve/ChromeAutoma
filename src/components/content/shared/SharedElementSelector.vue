@@ -48,6 +48,10 @@ import getSelectorOptions from '@/content/elementSelector/getSelectorOptions';
 import { generateXPath, getElementPath, getElementRect } from '@/content/utils';
 import findElementList from '@/content/elementSelector/listSelector';
 import generateElementsSelector from '@/content/elementSelector/generateElementsSelector';
+import {
+  getDeepestElementAtPoint,
+  isShadowElement,
+} from '@/content/elementSelector/shadowDomUtils';
 import SharedElementHighlighter from './SharedElementHighlighter.vue';
 
 const props = defineProps({
@@ -151,25 +155,49 @@ function retrieveElementsRect({ clientX, clientY, target: eventTarget }, type) {
 
   const isSelectList = props.list && props.selectorType === 'css';
 
-  let { 1: target } = document.elementsFromPoint(clientX, clientY);
-  if (!target) return;
+  // Use shadow-aware element detection
+  const deepResult = getDeepestElementAtPoint(clientX, clientY);
+  if (!deepResult) return;
+
+  let target = deepResult.element;
+  const shadowPath = deepResult.path;
+  const { inShadowDom } = deepResult;
+
+  // Get the element from light DOM for iframe check
+  // Filter out all automa overlay elements from the stack
+  const lightDomElements = document.elementsFromPoint(clientX, clientY);
+  const lightDomTarget = lightDomElements.find((el) => {
+    if (el.id === 'automa-selector-overlay') return false;
+    if (el.classList?.contains('automa-element-selector')) return false;
+    if (el.classList?.contains('automa-element-highlighter')) return false;
+    return true;
+  });
 
   const onlyInList = props.onlyInList && elementsState.selected.length > 0;
   const framesEl = ['IFRAME', 'FRAME'];
 
-  if (framesEl.includes(target.tagName)) {
+  // Handle iframes - check light DOM element for iframe detection
+  if (lightDomTarget && framesEl.includes(lightDomTarget.tagName)) {
     if (type === 'selected') removeElementsList();
 
-    if (target.contentDocument) {
-      frameElement = target;
-      frameElementRect = target.getBoundingClientRect();
+    if (lightDomTarget.contentDocument) {
+      frameElement = lightDomTarget;
+      frameElementRect = lightDomTarget.getBoundingClientRect();
 
       const yPos = clientY - frameElementRect.top;
       const xPos = clientX - frameElementRect.left;
 
-      target = target.contentDocument.elementFromPoint(xPos, yPos);
+      // Get deep element within iframe
+      const iframeDeepResult = getDeepestElementAtPoint(
+        xPos,
+        yPos,
+        lightDomTarget.contentDocument
+      );
+      if (iframeDeepResult) {
+        target = iframeDeepResult.element;
+      }
     } else {
-      const { top, left } = target.getBoundingClientRect();
+      const { top, left } = lightDomTarget.getBoundingClientRect();
       const payload = {
         top,
         left,
@@ -189,9 +217,9 @@ function retrieveElementsRect({ clientX, clientY, target: eventTarget }, type) {
         });
       }
 
-      target.contentWindow.postMessage(payload, '*');
-      frameElement = target;
-      frameElementRect = target.getBoundingClientRect();
+      lightDomTarget.contentWindow.postMessage(payload, '*');
+      frameElement = lightDomTarget;
+      frameElementRect = lightDomTarget.getBoundingClientRect();
       return;
     }
   } else {
@@ -212,15 +240,24 @@ function retrieveElementsRect({ clientX, clientY, target: eventTarget }, type) {
 
     if (type === 'hovered') hoveredElements = elements;
 
-    elementsRect = elements.map((el) =>
-      getElementRectWithOffset(el, { withAttribute, withElOptions })
-    );
+    elementsRect = elements.map((el) => {
+      const rect = getElementRectWithOffset(el, {
+        withAttribute,
+        withElOptions,
+      });
+      rect.inShadowDom = isShadowElement(el);
+      return rect;
+    });
   } else {
     if (type === 'hovered') hoveredElements = [target];
 
-    elementsRect = [
-      getElementRectWithOffset(target, { withAttribute, withElOptions }),
-    ];
+    const rect = getElementRectWithOffset(target, {
+      withAttribute,
+      withElOptions,
+    });
+    rect.inShadowDom = inShadowDom;
+    rect.shadowPath = shadowPath;
+    elementsRect = [rect];
   }
 
   elementsState[type] = elementsRect;
@@ -233,6 +270,8 @@ function retrieveElementsRect({ clientX, clientY, target: eventTarget }, type) {
       target,
       frameElement,
       hoveredElements,
+      shadowPath,
+      inShadowDom,
       list: isSelectList,
       selectorType: props.selectorType,
       selectorSettings: selectorOptions,
@@ -256,6 +295,7 @@ function retrieveElementsRect({ clientX, clientY, target: eventTarget }, type) {
       selectElements,
       elements: elementsRect,
       path: getElementPath(target),
+      inShadowDom,
     });
   }
 }

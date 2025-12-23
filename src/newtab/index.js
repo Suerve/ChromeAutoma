@@ -14,14 +14,27 @@ import '../assets/css/flow.css';
 
 const head = createHead();
 
-createApp(App)
-  .use(head)
-  .use(router)
-  .use(compsUi)
-  .use(pinia)
-  .use(vueI18n)
-  .use(vueToastification)
-  .use(vRemixicon, icons)
-  .mount('#app');
+const app = createApp(App);
+
+try {
+  console.log('Mounting: use head');
+  app.use(head);
+  console.log('Mounting: use router');
+  app.use(router);
+  console.log('Mounting: use compsUi');
+  app.use(compsUi);
+  console.log('Mounting: use pinia');
+  app.use(pinia);
+  console.log('Mounting: use vueI18n');
+  app.use(vueI18n);
+  console.log('Mounting: use vueToastification');
+  app.use(vueToastification);
+  console.log('Mounting: use vRemixicon');
+  app.use(vRemixicon, icons);
+  console.log('Mounting: mount #app');
+  app.mount('#app');
+} catch (error) {
+  console.error('Error during mounting:', error);
+}
 
 if (module.hot) module.hot.accept();

@@ -21,6 +21,7 @@ export function escapeElementPolicy(script) {
           break;
         } catch (e) {
           // 该名称失败，继续尝试下一个
+          /* eslint-disable-next-line no-console */
           console.debug(`Policy name ${policyName} failed, trying next one`);
         }
       }
@@ -30,12 +31,14 @@ export function escapeElementPolicy(script) {
         return escapePolicy.createScript(script);
       }
       // 如果所有策略名称都失败，返回原始脚本
+      /* eslint-disable-next-line no-console */
       console.debug(
         'All trusted policy creation attempts failed, falling back to raw script'
       );
       return script;
     } catch (e) {
       // 捕获任何其他错误并降级
+      /* eslint-disable-next-line no-console */
       console.debug('Error creating trusted policy:', e);
       return script;
     }

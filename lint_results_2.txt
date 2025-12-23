@@ -1,0 +1,20 @@
+
+> automa@1.29.12 lint
+> eslint --ext .js,.vue --ignore-path .gitignore .
+
+
+C:\Users\donteb\OneDrive\Projects\ChromeAutoma\src\newtab\pages\workflows\[id].vue
+  592:1  error  Delete `␍⏎`  prettier/prettier
+
+C:\Users\donteb\OneDrive\Projects\ChromeAutoma\src\params\App.vue
+  212:1  error  Delete `␍⏎`                                                                                   prettier/prettier
+  326:1  error  Replace `␍⏎··if·(name·===·'workflow:params')·{␍⏎` with `··if·(name·===·'workflow:params')·{`  prettier/prettier
+
+C:\Users\donteb\OneDrive\Projects\ChromeAutoma\src\workflowEngine\blocksHandler\handlerCreateElement.js
+  109:7  error  Insert `····`  prettier/prettier
+  110:1  error  Insert `····`  prettier/prettier
+  165:6  error  Delete `␍⏎`    prettier/prettier
+
+✖ 6 problems (6 errors, 0 warnings)
+  6 errors and 0 warnings potentially fixable with the `--fix` option.
+

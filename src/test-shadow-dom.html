@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shadow DOM Test Page</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          Oxygen, Ubuntu, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        background: #f5f5f5;
+      }
+      .test-section {
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #1e293b;
+      }
+      h2 {
+        color: #334155;
+        margin-top: 0;
+      }
+      .description {
+        color: #64748b;
+        margin-bottom: 1rem;
+      }
+      .regular-button {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🧪 Shadow DOM Element Selector Test Page</h1>
+    <p class="description">
+      Use this page to test the Automa element selector with Shadow DOM
+      elements. Elements inside Shadow DOM should be highlighted with
+      <strong>purple dashed borders</strong>.
+    </p>
+
+    <!-- Section 1: Regular DOM (for comparison) -->
+    <div class="test-section">
+      <h2>1. Regular DOM (No Shadow)</h2>
+      <p class="description">
+        These elements are in the regular DOM. They should have regular
+        highlighting.
+      </p>
+      <button class="regular-button" id="regular-btn">Regular Button</button>
+      <input
+        type="text"
+        placeholder="Regular input"
+        id="regular-input"
+        style="margin-left: 1rem; padding: 0.5rem"
+      />
+    </div>
+
+    <!-- Section 2: Single-level Shadow DOM -->
+    <div class="test-section">
+      <h2>2. Single-Level Shadow DOM</h2>
+      <p class="description">
+        Click the button inside this Shadow DOM. Expected selector:
+        <code>single-shadow-host >>> button.shadow-btn</code>
+      </p>
+      <single-shadow-host id="single-host"></single-shadow-host>
+    </div>
+
+    <!-- Section 3: Nested (2-level) Shadow DOM -->
+    <div class="test-section">
+      <h2>3. Nested Shadow DOM (2 Levels)</h2>
+      <p class="description">
+        Test element in a shadow root within another shadow root. Expected
+        selector:
+        <code>nested-outer-host >>> nested-inner-host >>> button.deep-btn</code>
+      </p>
+      <nested-outer-host id="nested-host"></nested-outer-host>
+    </div>
+
+    <!-- Section 4: Triple-nested Shadow DOM -->
+    <div class="test-section">
+      <h2>4. Triple-Nested Shadow DOM (3 Levels)</h2>
+      <p class="description">Three levels of shadow DOM nesting.</p>
+      <triple-outer-host id="triple-host"></triple-outer-host>
+    </div>
+
+    <!-- Section 5: Mixed content -->
+    <div class="test-section">
+      <h2>5. Mixed Content (Shadow + Regular siblings)</h2>
+      <p class="description">
+        Test selecting elements when shadow and regular DOM are adjacent.
+      </p>
+      <div style="display: flex; gap: 1rem; align-items: center">
+        <button class="regular-button">Regular Sibling</button>
+        <mixed-shadow-host></mixed-shadow-host>
+      </div>
+    </div>
+
+    <script>
+      // Single-level Shadow DOM
+      class SingleShadowHost extends HTMLElement {
+        constructor() {
+          super();
+          const shadow = this.attachShadow({ mode: 'open' });
+          shadow.innerHTML = `
+          <style>
+            .shadow-btn {
+              background: #8b5cf6;
+              color: white;
+              border: none;
+              padding: 0.5rem 1rem;
+              border-radius: 4px;
+              cursor: pointer;
+            }
+            .shadow-input {
+              padding: 0.5rem;
+              border: 2px solid #8b5cf6;
+              border-radius: 4px;
+              margin-left: 0.5rem;
+            }
+          </style>
+          <button class="shadow-btn">Shadow Button (Level 1)</button>
+          <input type="text" class="shadow-input" placeholder="Shadow input">
+        `;
+        }
+      }
+      customElements.define('single-shadow-host', SingleShadowHost);
+
+      // Nested Shadow DOM - Inner component
+      class NestedInnerHost extends HTMLElement {
+        constructor() {
+          super();
+          const shadow = this.attachShadow({ mode: 'open' });
+          shadow.innerHTML = `
+          <style>
+            .deep-btn {
+              background: #ec4899;
+              color: white;
+              border: none;
+              padding: 0.5rem 1rem;
+              border-radius: 4px;
+              cursor: pointer;
+            }
+          </style>
+          <div class="inner-container">
+            <button class="deep-btn">Deep Button (Level 2)</button>
+            <span style="margin-left: 0.5rem; color: #ec4899;">← Inside nested shadow</span>
+          </div>
+        `;
+        }
+      }
+      customElements.define('nested-inner-host', NestedInnerHost);
+
+      // Nested Shadow DOM - Outer component
+      class NestedOuterHost extends HTMLElement {
+        constructor() {
+          super();
+          const shadow = this.attachShadow({ mode: 'open' });
+          shadow.innerHTML = `
+          <style>
+            .outer-wrapper {
+              border: 2px dashed #a855f7;
+              padding: 1rem;
+              border-radius: 8px;
+            }
+            .outer-label {
+              color: #a855f7;
+              margin-bottom: 0.5rem;
+            }
+          </style>
+          <div class="outer-wrapper">
+            <div class="outer-label">Outer Shadow (Level 1)</div>
+            <nested-inner-host></nested-inner-host>
+          </div>
+        `;
+        }
+      }
+      customElements.define('nested-outer-host', NestedOuterHost);
+
+      // Triple-nested Shadow DOM components
+      class TripleDeepestHost extends HTMLElement {
+        constructor() {
+          super();
+          const shadow = this.attachShadow({ mode: 'open' });
+          shadow.innerHTML = `
+          <style>
+            .deepest-btn {
+              background: #f97316;
+              color: white;
+              border: none;
+              padding: 0.5rem 1rem;
+              border-radius: 4px;
+              cursor: pointer;
+            }
+          </style>
+          <button class="deepest-btn">Deepest Button (Level 3)</button>
+        `;
+        }
+      }
+      customElements.define('triple-deepest-host', TripleDeepestHost);
+
+      class TripleMiddleHost extends HTMLElement {
+        constructor() {
+          super();
+          const shadow = this.attachShadow({ mode: 'open' });
+          shadow.innerHTML = `
+          <style>
+            .middle-wrapper {
+              border: 2px solid #fb923c;
+              padding: 0.75rem;
+              border-radius: 6px;
+              background: #fff7ed;
+            }
+          </style>
+          <div class="middle-wrapper">
+            <span style="color: #f97316;">Middle Shadow (Level 2)</span>
+            <div style="margin-top: 0.5rem;">
+              <triple-deepest-host></triple-deepest-host>
+            </div>
+          </div>
+        `;
+        }
+      }
+      customElements.define('triple-middle-host', TripleMiddleHost);
+
+      class TripleOuterHost extends HTMLElement {
+        constructor() {
+          super();
+          const shadow = this.attachShadow({ mode: 'open' });
+          shadow.innerHTML = `
+          <style>
+            .triple-wrapper {
+              border: 2px dashed #14b8a6;
+              padding: 1rem;
+              border-radius: 8px;
+              background: #f0fdfa;
+            }
+          </style>
+          <div class="triple-wrapper">
+            <div style="color: #14b8a6; margin-bottom: 0.5rem;">Outer Shadow (Level 1)</div>
+            <triple-middle-host></triple-middle-host>
+          </div>
+        `;
+        }
+      }
+      customElements.define('triple-outer-host', TripleOuterHost);
+
+      // Mixed content component
+      class MixedShadowHost extends HTMLElement {
+        constructor() {
+          super();
+          const shadow = this.attachShadow({ mode: 'open' });
+          shadow.innerHTML = `
+          <style>
+            .mixed-btn {
+              background: #10b981;
+              color: white;
+              border: none;
+              padding: 0.5rem 1rem;
+              border-radius: 4px;
+              cursor: pointer;
+            }
+          </style>
+          <button class="mixed-btn">Shadow Sibling</button>
+        `;
+        }
+      }
+      customElements.define('mixed-shadow-host', MixedShadowHost);
+    </script>
+  </body>
+</html>

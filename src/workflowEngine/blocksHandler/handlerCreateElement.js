@@ -162,8 +162,6 @@ async function handleCreateElement(block, { refData }) {
         },
         'background'
       );
-    } else {
-      console.log('CreateElement: 使用CSP绕过方法执行代码');
     }
   }
 
